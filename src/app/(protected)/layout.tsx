@@ -19,7 +19,7 @@ const SidebarLayout = ({children} : Props) => {
             </div>
             <div className="h-4"></div>
             {/* Main Content */}
-            <div className='border-sidebar-border bg-sidebar border shadow rounded-mg overflow-y-scroll h-[calc(100vh-6rem)]'>
+            <div className='border-sidebar-border bg-sidebar border shadow rounded-mg overflow-y-scroll h-[calc(100vh-6rem)] p-2'>
                 {children}
             </div>
         </main>
