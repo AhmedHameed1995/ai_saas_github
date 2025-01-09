@@ -36,7 +36,7 @@ const items = [
 const AppSidebar = () => {
     const pathname = usePathname();
     const { open } = useSidebar();
-    const { projects } = useProject();
+    const { projects, projectId, setProjectId } = useProject();
     
     return (
         <Sidebar collapsible="icon" variant="floating">
@@ -82,7 +82,9 @@ const AppSidebar = () => {
                                 return (
                                     <SidebarMenuItem key={project.name}>
                                         <SidebarMenuButton asChild>
-                                            <div>
+                                            <div onClick={() => {
+                                                setProjectId(project.id)
+                                            }}>
                                                 <div className={cn('rounded-sm border size-6 flex items-center justify-center text-sm bg-white text-primary', 
                                                     {
                                                         'bg-primary text-white' : true
