@@ -105,4 +105,4 @@ async function filterUnprocessedCommits(projectId: string, commitHashes: Respons
 }
 // console.log(await getCommitHashes(githubUrl)) 
 
-await pollCommits('cm5ohk46l0000vxv7m2vlfb78').then(console.log)
+// await pollCommits('cm5ohk46l0000vxv7m2vlfb78').then(console.log)
