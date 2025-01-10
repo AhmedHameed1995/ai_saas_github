@@ -41,6 +41,7 @@ model Project {
     commits                     Commit[]
     sourceCodeEmbeddings        SourceCodeEmbedding[]
     savedQuestions              Question[]
+    meetings                    Meeting[]
 }
 
 model UserToProject {
@@ -58,7 +59,7 @@ model UserToProject {
 }
 
 model SourceCodeEmbedding {
-    id                  String  @id @default(cuid())
+    id                  String      @id @default(cuid())
 
     summaryEmbedding    Unsupported("vector(768)")?
     sourceCode          String
@@ -67,6 +68,43 @@ model SourceCodeEmbedding {
 
     projectId           String
     project             Project     @relation(fields: [projectId], references: [id])
+}
+
+model Meeting {
+    id                  String      @id @default(cuid())
+    name                String
+
+    createdAt           DateTime    @default(now())
+    updatedAt           DateTime    @updatedAt
+
+    meetingUrl          String      //Storage URL
+
+    projectId           String
+    project             Project     @relation(fields: [projectId], references: [id])
+
+    status              MeetingStatus   @default(PROCESSING)
+    issues              Issue[]
+}
+
+model Issue {
+    id                  String      @id @default(cuid())
+
+    createdAt           DateTime    @default(now())
+    updatedAt           DateTime    @updatedAt
+
+    start               String
+    end                 String
+    gist                String
+    headline            String
+    summmary            String
+
+    meetingId           String
+    meeting             Meeting     @relation(fields: [meetingId], references: [id])
+}
+
+enum MeetingStatus {
+    PROCESSING
+    COMPLETED
 }
 
 model Question {
