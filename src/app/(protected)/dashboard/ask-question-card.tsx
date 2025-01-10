@@ -12,6 +12,7 @@ import { readStreamableValue } from 'ai/rsc';
 import CodeReferences from './code-reference';
 import { api } from '@/trpc/react';
 import { toast } from 'sonner';
+import useRefetch from '@/hooks/use-refetch';
 
 const AskQuestionCard = () => {
     const { project } = useProject()
@@ -42,6 +43,8 @@ const AskQuestionCard = () => {
         setLoading(false)
     }
     
+    const refetch = useRefetch();
+
     return (
         <>
             <Dialog open={open} onOpenChange={setOpen}>
@@ -60,6 +63,7 @@ const AskQuestionCard = () => {
                                 }, {
                                     onSuccess: () => {
                                         toast.success('Answer saved!')
+                                        refetch()
                                     },
                                     onError: () => {
                                         toast.error('Failed to save answer!')
@@ -86,7 +90,7 @@ const AskQuestionCard = () => {
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={onSubmit}>
-                        <Textarea placeholder='Which file should i edir to change the homepage?' value={question} onChange={e => setQuestion(e.target.value)} />
+                        <Textarea placeholder='Which file should i edit to change the homepage?' value={question} onChange={e => setQuestion(e.target.value)} />
                         <div className="h-4"></div>
                         <Button type='submit' disable={loading}>
                             Ask Question
