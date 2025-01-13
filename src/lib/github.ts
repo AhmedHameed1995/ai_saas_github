@@ -2,12 +2,13 @@ import { db } from '@/server/db';
 import { Octokit } from 'octokit';
 import axios from 'axios';
 import { aiSummariseCommit } from './gemini';
+import { api } from '@/trpc/react';
 
 export const octokit = new Octokit({
   auth: process.env.GITHUB_TOKEN,
 });
 
-const githubUrl = 'https://github.com/AhmedHameed1995/ai_saas_github'
+const githubUrl = ''
 
 type Response = {
     commitHash: string;
@@ -45,12 +46,32 @@ export const pollCommits = async(projectId: string) => {
     const summaryResponses = await Promise.allSettled(unprocessedCommits.map(async (commit) => {
         return summarizeCommit(githubUrl, commit.commitHash)
     }))
+
     const summaries = summaryResponses.map((response) => {
         if(response.status === 'fulfilled') {
             return response.value as string
         } return ""
     })
 
+
+    await db.commit.deleteMany({
+        where: {
+            OR: [
+                // Match duplicates
+                ...summaries.map((_, index) => ({
+                    projectId: projectId,
+                    commitHash: unprocessedCommits[index]!.commitHash,
+                })),
+                // Match entries with empty summaries
+                {
+                    projectId: projectId,
+                    summary: '',
+                },
+            ],
+        },
+    });
+      
+    // Step 2: Insert new records
     const commits = await db.commit.createMany({
         data: summaries.map((summary, index) => {
             console.log(`processing commit ${index}`)
@@ -61,12 +82,12 @@ export const pollCommits = async(projectId: string) => {
                 commitAuthorName: unprocessedCommits[index]!. commitAuthorName,
                 commitAuthorAvatar: unprocessedCommits[index]!.commitAuthorAvatar,
                 commitDate: unprocessedCommits[index]!.commitDate,
-                summary
+                summary: summary
             }
-        })
-    })
+        }),
+    });
 
-    return unprocessedCommits;
+    return commits;
 }
 
 async function summarizeCommit(githubUrl: string, commitHash: string) {
@@ -105,4 +126,4 @@ async function filterUnprocessedCommits(projectId: string, commitHashes: Respons
 }
 // console.log(await getCommitHashes(githubUrl)) 
 
-// await pollCommits('cm5ohk46l0000vxv7m2vlfb78').then(console.log)
+// await pollCommits('cm5udoyvy0060q1rahj778ruy').then(console.log)

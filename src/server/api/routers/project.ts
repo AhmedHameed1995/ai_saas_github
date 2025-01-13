@@ -26,8 +26,8 @@ export const projectRouter = createTRPCRouter({
                 }
             }
         })
-        await indexGithubRepo(project.id, input.githubUrl, input.githubToken)
         await pollCommits(project.id)
+        await indexGithubRepo(project.id, input.githubUrl, input.githubToken)
         return project
     }),
     getProjects: protectedProcedure.query(async ({ ctx }) => {
@@ -106,6 +106,39 @@ export const projectRouter = createTRPCRouter({
             },
             include: {
                 issues: true
+            }
+        })
+    }),
+    deleteMeeting: protectedProcedure.input(z.object({
+        meetingId: z.string()
+    })).mutation( async ({ ctx, input}) => {
+        return await ctx.db.meeting.delete({
+            where: {
+                id: input.meetingId
+            }
+        })
+    }),
+    getMeetingById: protectedProcedure.input(z.object({
+        meetingId: z.string()
+    })).query( async ({ ctx, input}) => {
+        return await ctx.db.meeting.findUnique({
+            where: {
+                id: input.meetingId
+            },
+            include: {
+                issues: true
+            }
+        })
+    }),
+    archiveProject: protectedProcedure.input(z.object({
+        projectId: z.string()
+    })).mutation( async ({ ctx, input}) => {
+        return await ctx.db.project.update({
+            where: {
+                id: input.projectId
+            },
+            data: {
+                deletedAt: new Date()
             }
         })
     }),

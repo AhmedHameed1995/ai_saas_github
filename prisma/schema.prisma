@@ -96,7 +96,7 @@ model Issue {
     end                 String
     gist                String
     headline            String
-    summmary            String
+    summary             String
 
     meetingId           String
     meeting             Meeting     @relation(fields: [meetingId], references: [id])

@@ -12,7 +12,13 @@ const CommitLog = () => {
     return (
         <>
             <ul className='space-y-6'>
-                {commits?.map((commit, commitIdx) => {
+                {commits?
+                .sort((a, b) => {
+                    const dateA = new Date(a.commitDate).getTime();
+                    const dateB = new Date(b.commitDate).getTime();
+                    return dateB - dateA; // Sort by date descending (newest first)
+                })// Sort by commitDate (newest first)
+                .map((commit, commitIdx) => {
                     return <li key={commit.id} className='relative flex gap-x-4'>
                         <div className={cn(
                             commitIdx === commits.length - 1 ? 'h-6' : '-bottom-6',
